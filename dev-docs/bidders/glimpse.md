@@ -1,95 +1,132 @@
 ---
 layout: bidder
 title: Glimpse Protocol
-description: Glimpse Protocol Bidder Adapter
+description: Glimpse Protocol Bid Adapter
 biddercode: glimpse
 pbjs: true
-gdpr_supported: true
+tcfeu_supported: true
+usp_supported: true
+deals_supported: true
 media_types: banner
+gvl_id: 1012
+sidebarType: 1
 ---
 
-## Overview
+{: .alert.alert-warning :}
+glimpse is probably a defunct bidder, as the glimpseportal.io domain is no longer active.
 
-```
-Module Name: Glimpse Protocol Adaptor
+### Overview
+
+```text
+Module Name: Glimpse Protocol Bid Adapter
 Module Type: Bidder Adapter
-Maintainer: tim@glimpseprotocol.io
+Maintainer: support@glimpseportal.io
 ```
 
-## Description
+### Description
 
-This module connects publishers to Glimpse Protocol's demand sources via Prebid.js. Our
-innovative marketplace protects consumer privacy while allowing precise targeting. It is
-compliant with GDPR, DPA and CCPA.
+Glimpse protects consumer privacy while allowing precise targeting. This module connects publishers
+to Glimpse Protocol's demand sources via Prebid.js.
 
-This module was built and tested against prebid 3.21.0 and so compatibility against
-version 2 and earlier is unknown.
+### Supported Media Types
 
-## Media Types
+{: .table .table-bordered .table-striped }
 
-| Type     | Support                                                            |
-| -------- | ------------------------------------------------------------------ |
-| `Banner` | Fully supported for 320x50, 300x250, 300x600, 728x90, and 970x250. |
+| Type | Sizes |
+| -------- | ----------------------------------------- |
+| `Banner` | 300x250, 300x600, 320x50, 728x90, 970x250 |
 
-## Bid Parameters
+### Setup
 
-The only parameter is `placementId` and it is required.
+### Prerequisites
 
-### Banner
+Before you start, you will need to build a `prebid.js` file with the Glimpse module included, and include both `gpt.js` and `prebid.js` in the `head` of each page with supply. An example of a typical pair of script tags might be:
 
-| Name          | Scope    | Description                                                                                                      | Example                | Type   |
-| ------------- | -------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------- | ------ |
-| `placementId` | Required | An identifier associated unique to a publisher and ad unit. Values can be obtained through our publisher portal. | 'glimpse-demo-300x250' | String |
+```html
+<script
+  async
+  src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"
+></script>
 
-## Setup Guide
+<script async src="https://<PUBLISHER_DOMAIN>/prebid.js"></script>
+```
 
-Follow these steps to configure and add the glimpse module to your Prebid.js integration.
+### Configuration
 
-### 0. Preconditions
+### Bid Requests
 
-- A built prebid module with the glimpse adaptor included
-- You've included the built prebid adaptor and GPT script in your websites html code
-- You've setup GAM mappings
+Our adapter expects the following values in the `params` block of each bid request:
 
-### 1. Create an account and setup your domain via the Publisher Portal
+{: .table .table-bordered .table-striped }
 
-Coming soon.
+| Name | Scope | Type | Description | Example |
+| ----- | -------- | ------ | --------------------------------------------------------------------------------------------------- | ---------------------- |
+| `pid` | Required | string | A unique identifier representing an ad unit. It is provided by Glimpse when registering an ad unit. | 'glimpse-placement-id' |
 
-### 2. Enable Glimpse as a bidder on your ad units
+#### Example
 
 ```javascript
-const adUnits = {
-  code: 'your-ad-unit-div-id',
-  mediaTypes: {
-    banner: {
-      sizes: [[300, 250]],
+const units = [
+  {
+    code: "ad-unit-0",
+    mediaTypes: {
+      banner: { sizes: [[300, 250]] },
     },
-  },
-  bids: [
-    {
-      bidder: 'glimpse',
-      params: {
-        placementId: 'placementId-from-publisher-portal',
+    bids: [
+      {
+        bidder: "glimpse",
+        params: {
+          pid: "glimpse-placement-id",
+        },
       },
-    },
-    ...
-  ],
-  ...
-}
+    ],
+  },
+]
 ```
 
-## FAQs
+### First Party Data
 
-### Can I test my setup without a Publisher Portal Account?
+Our adapter works with first party data providers as described [here](https://docs.prebid.org/features/firstPartyData.html). In this example we add Permutive data to our bidder request using [setBidderConfig](https://docs.prebid.org/features/firstPartyData.html#supplying-bidder-specific-data).
 
-Yep. Use a demo placementId:
+#### Example
 
-- glimpse-demo-320x50
-- glimpse-demo-300x250
-- glimpse-demo-300x600
-- glimpse-demo-728x90
-- glimpse-demo-970x250
+```javascript
+pbjs.que.push(() => {
+  pbjs.setBidderConfig({
+    bidders: ["glimpse"],
+    config: {
+      ortb2: {
+        site: {
+          keywords: "business,finance,crypto",
+          ext: {
+            data: {
+              permutive: {
+                pvc: JSON.parse(localStorage.getItem("permutive-pvc")) ?? {},
+              },
+            },
+          },
+        },
+        user: {
+          ext: {
+            data: {
+              permutive: {
+                keywords: JSON.parse(localStorage.getItem("_psegs")) ?? [],
+                enrichers:
+                  JSON.parse(
+                    localStorage.getItem("permutive-data-enrichers")
+                  ) ?? {},
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+})
+```
 
-### How do I get more help?
+### FAQs
 
-Reach out to us at [hello@glimpseprotocol.io](mailto:hello@glimpseprotocol.io)
+#### Can you provide additional support?
+
+Of course! You can check the Glimpse Prebid Adapter documentation or reach out to us at <support@glimpseportal.io>.
