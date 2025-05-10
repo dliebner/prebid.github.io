@@ -2,10 +2,11 @@
 layout: bidder
 title: adxcg
 description: Prebid adxcg bidder adaptor
-hide: true
+pbjs: true
 biddercode: adxcg
 media_types: native, video
 gdpr_supported: true
+userIds: id5Id, identityLink, pubCommonId, unifiedId
 ---
 
 ### Bid Params
